@@ -38,6 +38,6 @@
 
 ```bash
 git clone https://github.com/Jacksony100/WebVulnScanner
-cd web-vuln-scanner
+cd WebVulnScanner
 pip install -r requirements.txt
 python app.py
