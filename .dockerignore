@@ -1,0 +1,16 @@
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+*.log
+report.html
+report.pdf
+report.tex
+*.aux
+*.out
+.git
+.gitignore
+.env

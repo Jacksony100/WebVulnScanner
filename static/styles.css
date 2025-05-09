@@ -1,0 +1,53 @@
+/* static/styles.css */
+/* Стили для интерфейса и отчетов */
+
+body {
+    padding: 20px;
+}
+
+.progress {
+    height: 24px;
+}
+
+pre {
+    white-space: pre-wrap;
+    word-break: break-all;
+    background: #212529;
+    padding: 8px;
+    border-radius: 6px;
+}
+
+#themeSwitch {
+    cursor: pointer;
+}
+
+#chart,
+#sevChart {
+    width: 260px;
+    height: 260px;
+    margin: auto;
+}
+
+.sev-Critical {
+    color: #dc3545;
+    font-weight: 700;
+}
+
+.sev-High {
+    color: #fd7e14;
+    font-weight: 700;
+}
+
+.sev-Medium {
+    color: #ffc107;
+    font-weight: 700;
+}
+
+.sev-Low {
+    color: #20c997;
+    font-weight: 700;
+}
+
+.card-header {
+    font-weight: 600;
+}
