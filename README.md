@@ -37,7 +37,7 @@
 ## 📦 Установка
 
 ```bash
-git clone https://github.com/Jacksony100/web-vuln-scanner.git
+git clone https://github.com/Jacksony100/WebVulnScanner
 cd web-vuln-scanner
 pip install -r requirements.txt
 python app.py
