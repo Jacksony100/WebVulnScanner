@@ -1,118 +1,232 @@
-# AdvancedScanner
+# AdvancedScanner v6.0
 
-AdvancedScanner is a local, defensive web vulnerability scanner for authorized CTF, HackTheBox-like labs, PortSwigger labs, self-hosted targets, and bug bounty scopes where testing is explicitly permitted.
+<div align="center">
 
-It is designed to map attack surface first, then run bounded passive/active checks with scope enforcement, request budgets, rate limits, timeouts, cancellation, and redacted evidence.
+**Локальный защитный сканер веб-уязвимостей для CTF, лабораторий и разрешенного bug bounty**
 
-## Screenshots
+[![Python](https://img.shields.io/badge/Python-3.10%2B-3776AB?style=flat-square&logo=python&logoColor=white)](#)
+[![Mode](https://img.shields.io/badge/default-safe%2Fpassive-10B981?style=flat-square)](#режимы-сканирования)
+[![Scope](https://img.shields.io/badge/scope-enforced-2563EB?style=flat-square)](#безопасность)
+[![Tests](https://img.shields.io/badge/tests-59%20passed-22C55E?style=flat-square)](#тесты)
 
-### Web UI
+</div>
 
-![AdvancedScanner Web UI](screenshots/ui.png)
+AdvancedScanner помогает быстро понять поверхность атаки веб-приложения и найти подтвержденные security-сигналы без шума от неподтвержденных common paths. Сканер работает локально, уважает scope, бюджеты запросов, rate limit и по умолчанию остается в safe/passive режиме.
 
-### HTML Report
+Подходит для:
 
-![AdvancedScanner HTML report](screenshots/report.png)
+- CTF и HackTheBox-like лабораторий;
+- PortSwigger Web Security Academy и self-hosted targets;
+- bug bounty scopes, где тестирование явно разрешено;
+- локальной инвентаризации attack surface перед ручной проверкой.
 
-## Safety Rules
+> Используйте только на целях, где у вас есть разрешение. Private/internal IP, localhost и metadata ranges заблокированы по умолчанию, кроме явного lab/private режима.
 
-- Default mode is `safe`.
-- Active and deep checks require explicit authorization.
-- Targets must stay inside the configured scope hosts.
-- Private/internal IPs, localhost, link-local, and metadata addresses are blocked by default.
-- Enable private IP scanning only with `--allow-private-ips` or the UI lab/private checkbox for authorized local labs.
-- No stealth/evasion, WAF bypass, CAPTCHA bypass, auth brute force, password spraying, credential stuffing, persistence, malware, shells, reverse shells, destructive exploitation, or data exfiltration.
-- Payloads are safe validation probes: reflection markers, parser-error probes, arithmetic SSTI probes, boolean/time SQLi probes with strict budgets, and CRLF markers.
+## Скриншоты
 
-## Architecture
+### Веб-интерфейс
 
-The scanner core is now discovery-first:
+<img src="screenshots/ui.png" alt="AdvancedScanner Web UI" width="100%">
 
-- `scanner/models.py`: `RequestTemplate`, `Finding`, `ScanConfig`, `ScanState`, `HttpResponseSnapshot`.
-- `scanner/scope.py`: URL normalization, scope checks, private IP blocking, SSRF-style scheme rejection.
-- `scanner/http_client.py`: one async request gateway with budgets, rate limiting, timeout, cancellation, scope enforcement, and redacted request logging.
-- `scanner/registry.py`: request/finding dedupe and prioritization.
-- `scanner/discovery/`: HTML/forms, JS endpoint extraction, sitemap, robots, OpenAPI, GraphQL signals, optional Playwright hook.
-- `scanner/checks/`: modular checks with severity, confidence, evidence, remediation, source, tags.
-- `scanner/scheduler.py`: passive-first then active/deep scheduling under budgets.
-- `scanner/scanner.py`: thin orchestrator.
-- `scanner/legacy_compat.py`: compatibility helpers for older tests/reporting while the new core is primary.
+### HTML-отчет
 
-## Modes
+<img src="screenshots/report.png" alt="AdvancedScanner HTML report" width="100%">
 
-- `safe`: discovery, passive headers, JWT/source-map/API-doc inventory, no active payload mutation.
-- `active`: safe plus authorized low-risk validation probes for XSS reflection, SQLi, SSTI, CRLF, open redirect, CORS, GraphQL introspection, potential object references, and common exposures.
-- `deep`: larger budgets and external discovery/checks; still no destructive payloads or automated exploitation.
+## Что умеет
 
-## Discovery Sources
+- Разделяет **Findings**, **Assets** и **Discovery candidates**.
+- Не превращает `/graphql`, `/api/graphql`, `/v1/graphql` из common list в фейковые findings.
+- Валидирует GraphQL, OpenAPI, source maps и exposure paths перед повышением уверенности.
+- Строит `SiteProfile`: HTTP status, final URL, Server, X-Powered-By, title, content-type, IP, response time и lightweight tech hints.
+- Показывает diagnostics: request counters, phase timings, skip reasons, slow requests, warnings.
+- Не запускает активные проверки на неподходящих шаблонах: статике, URL без параметров, неподтвержденных candidates.
+- Держит safe scan быстрым и предсказуемым: лимиты по времени, запросам, discovery и active phases.
 
-- Links, canonical/alternate links, iframes, meta refresh.
-- Forms with method/action/enctype and hidden/select/checkbox/radio/textarea values.
-- Same-scope JavaScript files with `fetch`, `axios`, `XMLHttpRequest`, `$.ajax`, and route-string extraction.
-- `sitemap.xml`, `robots.txt`, `security.txt`.
-- OpenAPI/Swagger candidates.
-- GraphQL endpoint candidates.
-- Optional external tools: Katana, ffuf, Nuclei, SSLyze, Retire.js.
-
-## Checks
-
-- Security headers and cookie posture.
-- OpenAPI/Swagger exposed document inventory.
-- Source map validation with real JSON shape checks.
-- JWT passive detection without cracking.
-- Reflected input and potential XSS context checks.
-- SQLi error/boolean/time probes with safe budgets.
-- SSTI arithmetic-only probes.
-- Open redirect using parsed `Location` host comparison.
-- CRLF marker detection.
-- Common exposure rules with signatures, not plain `200 OK`.
-- CORS origin reflection/wildcard checks.
-- GraphQL endpoint, introspection, and verbose error checks.
-- Potential IDOR/Object Reference only; it is not reported as confirmed IDOR without a second auth context.
-
-## Web UI
+## Быстрый старт
 
 ```bash
+git clone https://github.com/Jacksony100/WebVulnScanner.git
+cd WebVulnScanner
+
+python3 -m venv .venv
+source .venv/bin/activate
+python3 -m pip install -r requirements.txt
+
 python3 app.py
 ```
 
-The UI binds to `127.0.0.1:5005` by default and prints a startup token for protected POST actions.
+UI поднимается на `127.0.0.1:5005` и печатает startup token для защищенных POST-действий.
 
-Use the lab/private checkbox only for local CTF/lab/self-hosted targets such as `127.0.0.1`, `10.x.x.x`, or `192.168.x.x`.
+Откройте:
 
-## CLI
+```text
+http://127.0.0.1:5005
+```
+
+Для локальных labs включайте checkbox `Lab/private`. Без него scanner намеренно блокирует localhost/private ranges.
+
+## Командная строка
+
+Safe scan внешней разрешенной цели:
 
 ```bash
 python3 app.py https://example.com --mode safe
-python3 app.py https://example.com --mode active --authorized
-python3 app.py http://127.0.0.1:8080 --mode active --authorized --allow-private-ips
 ```
 
-HTML reports are written to `reports/report.html`.
+Active scan только при явном разрешении:
 
-## External Tools
+```bash
+python3 app.py https://example.com --mode active --authorized
+```
+
+Локальная лаборатория:
+
+```bash
+python3 app.py http://127.0.0.1:8080 \
+  --mode active \
+  --authorized \
+  --allow-private-ips \
+  --max-requests 120 \
+  --max-duration 120
+```
+
+HTML-отчет сохраняется в:
+
+```text
+reports/report.html
+```
+
+## Режимы сканирования
+
+| Режим | Назначение | Дефолтные лимиты | Активные payloads |
+| --- | --- | --- | --- |
+| `safe` | Быстрый пассивный обзор, headers, cookies, forms, JS hints, OpenAPI/GraphQL candidates | `45s`, `40` requests, `25` discovery requests | Нет |
+| `active` | Разрешенные низкорисковые проверки input points | `180s`, `250` requests, `150` active requests | Да, строго bounded |
+| `deep` | Более широкое discovery и optional external engines | `600s`, configurable request budget | Да, bounded |
+
+Приоритет scheduler:
+
+1. URL с query params.
+2. Forms.
+3. JSON API templates.
+4. OpenAPI templates.
+5. Validated GraphQL.
+6. Interesting `401/403/5xx`.
+7. Common candidates в последнюю очередь.
+
+## Безопасность
+
+AdvancedScanner спроектирован как защитный инструмент для разрешенного тестирования.
+
+- Режим по умолчанию: `safe`.
+- Active/deep требуют явного выбора режима и authorization-флага.
+- Scope enforced на уровне HTTP-клиента.
+- Private/internal IP blocked by default.
+- Нет WAF bypass, auth bypass, brute force, password spraying, persistence, shells, destructive requests или exfiltration.
+- GraphQL introspection проверяется только безопасным query и с жестким лимитом запросов.
+- Evidence редактируется и не хранит sensitive headers/cookies.
+
+## Находки, активы и кандидаты
+
+Scanner v6.0 больше не смешивает discovery-события и security findings.
+
+| Тип | Что означает | Пример |
+| --- | --- | --- |
+| `Finding` | Security-relevant issue с evidence, confidence и remediation | `GraphQL introspection enabled` |
+| `Asset` | Подтвержденная часть attack surface | validated GraphQL endpoint, OpenAPI document, source map |
+| `DiscoveryCandidate` | Неподтвержденный кандидат, который может быть полезен дальше | `/graphql` из common path list |
+
+Правило простое: common path сначала candidate, после безопасной валидации asset, и только при security evidence finding.
+
+## Архитектура
+
+```text
+scanner/
+  models.py          # ScanConfig, ScanState, Finding, Asset, DiscoveryCandidate
+  scope.py           # scope checks, private IP blocking, URL normalization
+  http_client.py     # request gateway, budgets, rate limit, diagnostics
+  registry.py        # dedupe, templates, findings/assets/candidates
+  discovery/         # HTML, forms, JS, OpenAPI, GraphQL, well-known paths
+  checks/            # modular passive/active checks with supports(template)
+  scheduler.py       # phase budgets, prioritization, skip reasons
+  scanner.py         # orchestration
+```
+
+Основной flow:
+
+```text
+InitialProbe -> SiteProfile
+Discovery    -> Candidates + RequestTemplates + Assets
+Scheduler    -> Passive checks -> Active checks when allowed
+Report       -> Findings + Assets + Candidates + Diagnostics
+```
+
+## Проверки
+
+- Security headers и cookie posture.
+- OpenAPI/Swagger inventory с validation.
+- Source map validation по JSON-ключам `version`, `sources`, `mappings`.
+- JWT passive detection без cracking.
+- Reflected input и XSS context hints.
+- SQLi parser-error / boolean / time probes с safe budgets.
+- SSTI arithmetic-only probes.
+- Open redirect с корректным parsing `Location`.
+- CRLF marker detection в active/deep.
+- Exposure rules по signatures, не по одному `200 OK`.
+- CORS reflection/wildcard checks.
+- GraphQL validation, introspection и verbose error leakage.
+- Potential object reference без ложного High без второго auth context.
+
+## Внешние движки
+
+Optional engines усиливают active/deep режимы, но не обязательны:
+
+- Nuclei
+- Katana
+- ffuf
+- SSLyze
+- Retire.js
+- Semgrep
+- Gitleaks
+- OSV-Scanner
+- Schemathesis
+- OWASP ZAP
+
+Установка:
 
 ```bash
 ./scripts/install_engines.sh
 ```
 
-External tools are optional and fail safe. Missing tools create warnings/status entries, not crashes. Nuclei is run with intrusive/dos/bruteforce templates excluded; Katana/ffuf discoveries are fed back into the request registry.
+Если инструмент отсутствует, scanner добавляет warning/status entry и продолжает работу без падения.
 
-## Tests
+## Тесты
 
 ```bash
-PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests
-python3 -m compileall -q app.py scanner tests
+PYTHONDONTWRITEBYTECODE=1 python3 -m pytest -q
+PYTHONDONTWRITEBYTECODE=1 python3 -m compileall -q app.py scanner tests
 python3 -m pip check
 ```
 
-## Limitations
+Текущий regression pack покрывает:
 
-- Authenticated multi-user authorization testing is not automatic yet; IDOR remains “Potential” without two configured auth contexts.
-- Playwright capture is a safe stub until explicit browser capture flows are wired.
-- The scanner does not bypass CAPTCHAs, login protections, WAFs, or rate limits.
-- Findings are evidence-based hints for authorized validation; bug bounty reports should still include manual verification.
+- GraphQL common candidates не становятся findings без валидации.
+- Valid GraphQL endpoint становится asset.
+- Introspection становится finding только после подтверждения.
+- SiteProfile заполняет HTTP, Server, Powered-By, response time.
+- Safe scan быстро выходит на статической странице без input points.
+- Active checks пропускают unsupported templates с skip reason.
+- Request budget enforced.
+- Source map validation не ловит произвольный JSON.
+- Open redirect parsing не принимает `https://example.com@example.test` за redirect на `example.com`.
 
-## Author
+## Ограничения
 
-Coded by Jacksony (t.me/Smesharik_lair)
+- Authenticated multi-user authorization testing пока не автоматизирован; IDOR остается `Potential` без второго auth context.
+- Playwright capture оставлен как safe hook до явного browser-capture workflow.
+- Scanner не обходит CAPTCHA, login protections, WAF и rate limits.
+- Findings являются evidence-based сигналами для дальнейшей ручной валидации.
+
+## Автор
+
+Проект Jacksony: `t.me/Smesharik_lair`
