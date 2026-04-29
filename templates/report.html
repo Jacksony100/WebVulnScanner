@@ -1,116 +1,354 @@
 <!DOCTYPE html>
 <html lang="ru" data-bs-theme="dark">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Отчёт по сканированию уязвимостей</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
   <style>
+    :root {
+      --bg: #111318;
+      --panel: #191c22;
+      --panel-2: #20242c;
+      --line: #303640;
+      --text: #f4f6f8;
+      --muted: #9ca7b4;
+      --accent: #4f8cff;
+      --critical: #dc3545;
+      --high: #fd7e14;
+      --medium: #ffc107;
+      --low: #20c997;
+    }
+    * { box-sizing: border-box; }
     body {
-      background-color: #212529;
-      color: #f8f9fa;
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
-    .table-dark {
-      background-color: #343a40;
+    main {
+      width: min(1180px, calc(100% - 32px));
+      margin: 0 auto;
+      padding: 32px 0 48px;
     }
-    .sev-Critical { background-color: #dc3545 !important; color: #fff; }
-    .sev-High { background-color: #fd7e14 !important; color: #fff; }
-    .sev-Medium { background-color: #ffc107 !important; color: #212529; }
-    .sev-Low { background-color: #198754 !important; color: #fff; }
-    .sev-Unknown { background-color: #6c757d !important; color: #fff; }
-    .payload-pre {
-      white-space: pre-wrap;
-      word-break: break-word;
-      max-width: 100%;
-      font-size: 0.875rem;
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+    h1, h2 { margin: 0; letter-spacing: 0; }
+    h1 { font-size: 2.4rem; }
+    h2 { font-size: 1.1rem; }
+    .muted { color: var(--muted); }
+    .panel, .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--panel);
+    }
+    .panel { padding: 18px; margin-bottom: 16px; }
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+    .metric { padding: 14px; }
+    .metric span, .info-grid span {
+      display: block;
+      color: var(--muted);
+      font-size: 0.78rem;
+      font-weight: 700;
+    }
+    .metric strong {
+      display: block;
+      margin-top: 6px;
+      font-size: 1.8rem;
+    }
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .info-grid div {
+      min-width: 0;
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel-2);
+    }
+    .info-grid strong {
+      display: block;
+      margin-top: 6px;
+      overflow-wrap: anywhere;
+    }
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .chip {
+      display: inline-flex;
+      min-height: 28px;
+      align-items: center;
+      padding: 4px 10px;
+      border-radius: 999px;
+      background: rgba(79, 140, 255, 0.16);
+      color: var(--text);
+      font-size: 0.84rem;
+      font-weight: 650;
     }
     .chart-container {
-      position: relative;
-      height: 300px;
-      width: 100%;
-      margin-top: 20px;
-      margin-bottom: 40px;
+      height: 260px;
+      margin-top: 12px;
     }
-    td.text-break {
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+    }
+    th, td {
+      padding: 12px;
+      border-top: 1px solid var(--line);
+      vertical-align: top;
+      text-align: left;
+    }
+    th {
+      color: var(--muted);
+      font-size: 0.78rem;
+      text-transform: uppercase;
+    }
+    small {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+    }
+    .severity {
+      display: inline-flex;
+      min-height: 26px;
+      align-items: center;
+      padding: 3px 8px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      font-weight: 800;
+    }
+    .sev-Critical { background: var(--critical); color: #fff; }
+    .sev-High { background: var(--high); color: #fff; }
+    .sev-Medium { background: var(--medium); color: #1b1b1b; }
+    .sev-Low { background: var(--low); color: #0b1b14; }
+    .sev-Info, .sev-Unknown { background: #6c757d; color: #fff; }
+    pre {
+      max-width: 360px;
+      max-height: 180px;
+      margin: 0;
+      padding: 10px;
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: var(--panel-2);
+      color: var(--text);
+      white-space: pre-wrap;
       overflow-wrap: anywhere;
+      font-size: 0.82rem;
+    }
+    .url { overflow-wrap: anywhere; }
+    @media (max-width: 900px) {
+      header, .summary, .info-grid { display: block; }
+      .metric, .info-grid div { margin-bottom: 10px; }
     }
   </style>
 </head>
 <body>
-  <div class="container py-4">
-    <h1 class="mb-3">🔒 Отчёт по сканированию уязвимостей</h1>
-    <h5 class="mb-4">Версия сканера: 5.1 | Дата: {{ now.strftime('%Y-%m-%d %H:%M:%S') }}</h5>
-
-    <div class="row mb-3">
-      <div class="col-md-6">
-        <h4>🎯 Цель сканирования</h4>
-        <p class="text-break">{{ target_url }}</p>
+  <main>
+    <header>
+      <div>
+        <h1>Отчёт по сканированию</h1>
+        <div class="muted">AdvancedScanner 6.0, {{ now.strftime('%Y-%m-%d %H:%M:%S') }}</div>
+        <div class="muted">Coded by Jacksony (t.me/Smesharik_lair)</div>
       </div>
-      <div class="col-md-6">
-        <h4>📦 Информация о CMS</h4>
-        <p><strong>CMS:</strong> {{ cms_info.cms or 'Не определено' }}, <strong>Версия:</strong> {{ cms_info.version or 'N/A' }}</p>
+      <div class="muted">Режим: {{ scan_info.mode or 'safe' }}</div>
+    </header>
+
+    <section class="summary">
+      <div class="metric"><span>Всего</span><strong>{{ vulns|length }}</strong></div>
+      <div class="metric"><span>Critical</span><strong>{{ severity_counts.get('Critical', 0) }}</strong></div>
+      <div class="metric"><span>High</span><strong>{{ severity_counts.get('High', 0) }}</strong></div>
+      <div class="metric"><span>Страниц</span><strong>{{ scan_info.pages_crawled or 0 }}</strong></div>
+      <div class="metric"><span>Форм</span><strong>{{ scan_info.forms_total or 0 }}</strong></div>
+    </section>
+
+    <section class="panel">
+      <h2>Информация о цели</h2>
+      <div class="info-grid">
+        <div><span>Target</span><strong>{{ target_url }}</strong></div>
+        <div><span>Final URL</span><strong>{{ scan_info.final_url or target_url }}</strong></div>
+        <div><span>HTTP</span><strong>{{ scan_info.status_code or 'N/A' }}</strong></div>
+        <div><span>Title</span><strong>{{ scan_info.title or 'N/A' }}</strong></div>
+        <div><span>CMS</span><strong>{{ cms_info.cms or 'Не определено' }}</strong></div>
+        <div><span>Версия CMS</span><strong>{{ cms_info.version or 'N/A' }}</strong></div>
+        <div><span>Server</span><strong>{{ scan_info.server or 'N/A' }}</strong></div>
+        <div><span>Powered by</span><strong>{{ scan_info.powered_by or 'N/A' }}</strong></div>
+        <div><span>IP</span><strong>{{ (scan_info.ip_addresses or [])|join(', ') or 'N/A' }}</strong></div>
+        <div><span>Content-Type</span><strong>{{ scan_info.content_type or 'N/A' }}</strong></div>
+        <div><span>Время ответа</span><strong>{% if scan_info.response_time_ms is not none %}{{ scan_info.response_time_ms }} ms{% else %}N/A{% endif %}</strong></div>
+        <div><span>URL с параметрами</span><strong>{{ scan_info.query_urls_total or 0 }}</strong></div>
       </div>
-    </div>
+      <div class="chip-row">
+        {% for tech in scan_info.technologies or [] %}
+        <span class="chip">{{ tech }}</span>
+        {% endfor %}
+        {% if not scan_info.technologies %}
+        <span class="chip">Технологии не определены</span>
+        {% endif %}
+      </div>
+    </section>
 
-    <h4>📊 Распределение по уровням важности</h4>
-    <div class="chart-container">
-      <canvas id="chart"></canvas>
-    </div>
+    <section class="panel">
+      <h2>Распределение по важности</h2>
+      <div class="chart-container"><canvas id="chart"></canvas></div>
+    </section>
 
-    <h4>🛡️ Найденные уязвимости</h4>
-    <div class="table-responsive mb-4">
-      <table class="table table-hover table-dark align-middle">
+    <section class="panel">
+      <h2>Внешние движки</h2>
+      <div class="chip-row">
+        {% set external = scan_info.external_engines or {} %}
+        {% for name, engine in (external.engines or {}).items() %}
+        {% set result = (external.results or {}).get(name, {}) %}
+        <span class="chip">
+          {{ engine.label or name }}:
+          {% if engine.available %}installed{% else %}missing{% endif %}
+          {% if result.status %} · {{ result.status }}{% endif %}
+          {% if result.findings %} · {{ result.findings }} findings{% endif %}
+        </span>
+        {% endfor %}
+        {% if not external.engines %}
+        <span class="chip">Статус движков не собран</span>
+        {% endif %}
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>Находки</h2>
+      {% if not vulns %}
+      <p class="muted">No actionable findings. Discovered {{ (scan_info.assets or [])|length + (scan_info.discovery_candidates or [])|length }} assets/candidates.</p>
+      {% endif %}
+      <table>
         <thead>
           <tr>
             <th>Важность</th>
-            <th>Тип</th>
-            <th>URL</th>
-            <th>Payload</th>
+            <th>Тип, confidence и evidence</th>
+            <th>Цель</th>
+            <th>Request</th>
           </tr>
         </thead>
         <tbody>
           {% for vuln in vulns %}
           <tr>
-            <td class="sev-{{ vuln.severity or 'Unknown' }}">{{ vuln.severity or 'Unknown' }}</td>
-            <td>{{ vuln.type or 'N/A' }}</td>
-            <td class="text-break">{{ vuln.url or 'N/A' }}</td>
-            <td><pre class="payload-pre">{{ vuln.payload|tojson(indent=2) or 'N/A' }}</pre></td>
+            <td><span class="severity sev-{{ vuln.severity or 'Info' }}">{{ vuln.severity or 'Info' }}</span></td>
+            <td>
+              <strong>{{ vuln.title or vuln.type or 'N/A' }}</strong>
+              <small>Confidence: {{ vuln.confidence or 'N/A' }} · Source: {{ vuln.source or 'scanner' }}</small>
+              <small>{{ vuln.evidence or 'evidence не указан' }}</small>
+              {% if vuln.remediation %}<small>Fix: {{ vuln.remediation }}</small>{% endif %}
+            </td>
+            <td class="url">{{ vuln.method or 'GET' }} {{ vuln.url or 'N/A'}}</td>
+            <td><pre>{{ vuln.payload | tojson(indent=2) | safe }}</pre></td>
           </tr>
           {% endfor %}
           {% if not vulns %}
-          <tr>
-            <td colspan="4" class="text-center">Нет уязвимостей 🎉</td>
-          </tr>
+          <tr><td colspan="4" class="muted">Находок нет</td></tr>
           {% endif %}
         </tbody>
       </table>
-    </div>
-  </div>
+    </section>
+
+    <section class="panel">
+      <h2>Assets / attack surface</h2>
+      <table>
+        <thead>
+          <tr><th>Type</th><th>URL</th><th>Evidence</th></tr>
+        </thead>
+        <tbody>
+          {% for asset in scan_info.assets or [] %}
+          <tr>
+            <td>{{ asset.type or 'endpoint' }}</td>
+            <td class="url">{{ asset.method or 'GET' }} {{ asset.url }}</td>
+            <td>{{ asset.evidence or '' }}<small>Confidence: {{ asset.confidence or 'Medium' }}</small></td>
+          </tr>
+          {% endfor %}
+          {% if not scan_info.assets %}
+          <tr><td colspan="3" class="muted">No validated assets</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel">
+      <h2>Discovery candidates</h2>
+      <table>
+        <thead>
+          <tr><th>Method</th><th>URL</th><th>Status</th><th>Reason / evidence</th></tr>
+        </thead>
+        <tbody>
+          {% for candidate in scan_info.discovery_candidates or [] %}
+          <tr>
+            <td>{{ candidate.method or 'GET' }}</td>
+            <td class="url">{{ candidate.url }}</td>
+            <td>{% if candidate.validated %}validated{% else %}not validated{% endif %}</td>
+            <td>{{ candidate.validation_evidence or candidate.reason or '' }}<small>Source: {{ candidate.source or '' }}</small></td>
+          </tr>
+          {% endfor %}
+          {% if not scan_info.discovery_candidates %}
+          <tr><td colspan="4" class="muted">No discovery candidates</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </section>
+
+    <section class="panel">
+      <h2>Scan diagnostics</h2>
+      {% set diag = scan_info.diagnostics or {} %}
+      <div class="info-grid">
+        <div><span>Requests</span><strong>{{ diag.requests_total or scan_info.request_count or 0 }}/{{ scan_info.request_budget or 'n/a' }}</strong></div>
+        <div><span>Duration</span><strong>{{ ((scan_info.duration_ms or 0) / 1000)|round(1) }} s</strong></div>
+        <div><span>Templates checked</span><strong>{{ diag.templates_checked or 0 }}</strong></div>
+        <div><span>Templates skipped</span><strong>{{ diag.templates_skipped or 0 }}</strong></div>
+        <div><span>Budget exhausted</span><strong>{{ 'yes' if diag.budget_exhausted else 'no' }}</strong></div>
+        <div><span>Deadline</span><strong>{{ diag.deadline_seconds or 'n/a' }} s</strong></div>
+      </div>
+      <div class="chip-row">
+        {% for reason, count in (diag.skipped_reasons or {}).items() %}
+        <span class="chip">{{ reason }}: {{ count }}</span>
+        {% else %}
+        <span class="chip">No skip reasons</span>
+        {% endfor %}
+      </div>
+    </section>
+  </main>
 
   <script>
     const severityCounts = {{ severity_counts|tojson }};
-    const labels = Object.keys(severityCounts);
-    const dataValues = Object.values(severityCounts);
-
+    const order = ['Critical', 'High', 'Medium', 'Low', 'Info', 'Unknown'];
+    const labels = order.filter(label => severityCounts[label]);
+    const dataValues = labels.map(label => severityCounts[label]);
     const ctx = document.getElementById('chart').getContext('2d');
     new Chart(ctx, {
       type: 'doughnut',
       data: {
-        labels: labels,
+        labels: labels.length ? labels : ['Нет находок'],
         datasets: [{
-          data: dataValues,
-          backgroundColor: ['#dc3545', '#fd7e14', '#ffc107', '#198754', '#6c757d']
+          data: dataValues.length ? dataValues : [1],
+          backgroundColor: ['#dc3545', '#fd7e14', '#ffc107', '#20c997', '#6c757d', '#495057'],
+          borderWidth: 0
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            position: 'bottom'
-          }
-        }
+        cutout: '68%',
+        plugins: { legend: { position: 'bottom' } }
       }
     });
   </script>

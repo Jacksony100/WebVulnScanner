@@ -1,10 +1,12 @@
 # scanner/utils.py
 # Вспомогательные функции
 
+import requests
 import random
 import string
-import requests
 from urllib.parse import urljoin
+
+from .scope import normalize_target_url
 
 from .payloads import HEADERS
 

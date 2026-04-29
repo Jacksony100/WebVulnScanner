@@ -5,141 +5,488 @@
   <title>Сканер уязвимостей веб-приложений</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='styles.css') }}" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-  <style>
-    body {
-      padding-top: 30px;
-    }
-    .sev-Critical { background-color: #dc3545 !important; color: white; }
-    .sev-High { background-color: #fd7e14 !important; color: white; }
-    .sev-Medium { background-color: #ffc107 !important; color: #212529; }
-    .sev-Low { background-color: #198754 !important; color: white; }
-    .sev-Unknown { background-color: #6c757d !important; color: white; }
-    pre {
-      white-space: pre-wrap;
-      word-wrap: break-word;
-      max-width: 400px;
-      font-size: 0.875rem;
-    }
-    .chart-container {
-      height: 300px;
-      width: 100%;
-      margin-bottom: 30px;
-    }
-    .info-box {
-      background-color: #2c3034;
-      border-radius: 8px;
-      padding: 1rem;
-    }
-    .info-box p {
-      margin: 0;
-    }
-  </style>
 </head>
 <body>
-  <div class="container">
-    <h1 class="mb-4">🔒 Сканер уязвимостей <small class="text-muted">v{{ version }}</small></h1>
-
-    <div class="mb-4">
-      <div class="input-group mb-2">
-        <input id="target" type="text" class="form-control" placeholder="https://example.com">
-        <button id="startBtn" class="btn btn-primary">🚀 Запустить сканирование</button>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <div class="eyebrow">AdvancedScanner v{{ version }}</div>
+        <h1>Сканер уязвимостей</h1>
+        <div class="credit">Coded by Jacksony (t.me/Smesharik_lair)</div>
       </div>
-      <div class="d-flex align-items-center">
-        <label for="threadsInput" class="form-label me-2 mb-0">Потоки:</label>
-        <input type="number" class="form-control w-25 me-4" id="threadsInput" value="10" min="1" max="50">
-        <div class="form-check form-switch">
-          <input class="form-check-input" type="checkbox" id="themeSwitch">
-          <label class="form-check-label" for="themeSwitch">Светлая тема</label>
+      <div class="topbar-actions">
+        <button id="themeBtn" class="icon-btn" type="button" aria-label="Переключить тему" title="Тема">◐</button>
+      </div>
+    </header>
+
+    <section class="panel scan-panel">
+      <div class="target-row">
+        <label class="visually-hidden" for="target">URL цели</label>
+        <input id="target" type="url" class="form-control target-input" placeholder="https://example.com">
+        <button id="startBtn" class="btn btn-primary start-btn" type="button">Запустить аудит</button>
+      </div>
+
+      <div class="control-grid">
+        <fieldset class="control-block">
+          <legend>Режим</legend>
+          <div class="segmented" role="radiogroup" aria-label="Режим сканирования">
+            <label>
+              <input type="radio" name="scanMode" value="safe" checked>
+              <span>Safe</span>
+            </label>
+            <label>
+              <input type="radio" name="scanMode" value="active">
+              <span>Active SQL/XSS</span>
+            </label>
+            <label>
+              <input type="radio" name="scanMode" value="deep">
+              <span>Deep</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="control-block threads-block">
+          <label for="threadsInput">Потоки</label>
+          <input type="number" class="form-control" id="threadsInput" value="10" min="1" max="50">
+        </div>
+
+        <div class="control-block threads-block">
+          <label for="maxRequestsInput">Max requests</label>
+          <input type="number" class="form-control" id="maxRequestsInput" placeholder="default">
+        </div>
+
+        <div class="control-block threads-block">
+          <label for="maxDurationInput">Max seconds</label>
+          <input type="number" class="form-control" id="maxDurationInput" placeholder="default">
+        </div>
+
+        <label id="authBlock" class="auth-check muted-check">
+          <input type="checkbox" id="authorizedInput">
+          <span>У меня есть разрешение на активную проверку этой цели</span>
+        </label>
+
+        <label class="auth-check visible muted-check">
+          <input type="checkbox" id="allowPrivateInput">
+          <span>Lab/private target: разрешить localhost и private IP</span>
+        </label>
+      </div>
+
+      <div id="modeNote" class="mode-note">
+        Safe собирает техническую информацию, заголовки, cookies, CMS, формы и пассивные проблемы.
+      </div>
+    </section>
+
+    <section class="panel engines-panel">
+      <div class="section-head compact">
+        <div>
+          <h2>Внешние движки</h2>
+          <p>Статус модулей, которые усиливают Active и Deep режимы.</p>
         </div>
       </div>
-    </div>
+      <div id="engineChips" class="chip-row">
+        <span class="chip muted">Проверяю установку...</span>
+      </div>
+    </section>
 
-    <div id="progressBox" class="mb-4" style="display:none;">
-      <div id="progMsg" class="mb-2 text-info">Ожидание...</div>
+    <section id="progressBox" class="panel progress-panel" hidden>
+      <div class="progress-copy">
+        <div class="progress-main">
+          <strong id="progMsg">Ожидание...</strong>
+        </div>
+        <div class="progress-actions">
+          <span id="progMeta">0%</span>
+          <button id="cancelBtn" class="btn btn-outline-warning btn-sm" type="button">Стоп</button>
+        </div>
+      </div>
       <div class="progress">
         <div id="progBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width:0%">0%</div>
       </div>
-    </div>
+    </section>
 
-    <div id="resultBox" style="display:none;">
-      <h2 class="mb-3">🧪 Результаты сканирования</h2>
-
-      <!-- График -->
-      <div class="chart-container">
-        <canvas id="chart"></canvas>
+    <section id="resultBox" class="results-grid" hidden>
+      <div class="summary-grid">
+        <div class="metric">
+          <span>Всего</span>
+          <strong id="totalCount">0</strong>
+        </div>
+        <div class="metric">
+          <span>Critical</span>
+          <strong id="criticalCount">0</strong>
+        </div>
+        <div class="metric">
+          <span>High</span>
+          <strong id="highCount">0</strong>
+        </div>
+        <div class="metric">
+          <span>Страниц</span>
+          <strong id="pagesCount">0</strong>
+        </div>
+        <div class="metric">
+          <span>Форм</span>
+          <strong id="formsCount">0</strong>
+        </div>
+        <div class="metric">
+          <span>Параметров URL</span>
+          <strong id="queryCount">0</strong>
+        </div>
       </div>
 
-      <!-- CMS + кнопка -->
-      <div class="row g-3 align-items-center mb-4">
-        <div class="col-md-8">
-          <div class="info-box">
-            <p><strong>CMS:</strong> <span id="cmsName">N/A</span></p>
-            <p><strong>Версия:</strong> <span id="cmsVersion">N/A</span></p>
+      <section class="panel info-panel">
+        <div class="section-head">
+          <div>
+            <h2>Информация о цели</h2>
+            <p id="targetTitle">Нет данных</p>
+          </div>
+          <a href="/download_html" target="_blank" class="btn btn-success">Скачать HTML</a>
+        </div>
+        <div class="info-grid">
+          <div><span>Final URL</span><strong id="finalUrl">N/A</strong></div>
+          <div><span>HTTP</span><strong id="statusCode">N/A</strong></div>
+          <div><span>CMS</span><strong id="cmsName">N/A</strong></div>
+          <div><span>Версия CMS</span><strong id="cmsVersion">N/A</strong></div>
+          <div><span>Server</span><strong id="serverName">N/A</strong></div>
+          <div><span>Powered by</span><strong id="poweredBy">N/A</strong></div>
+          <div><span>IP</span><strong id="ipList">N/A</strong></div>
+          <div><span>Время ответа</span><strong id="responseTime">N/A</strong></div>
+        </div>
+        <div id="techList" class="chip-row"></div>
+      </section>
+
+      <section class="panel chart-panel">
+        <div class="section-head compact">
+          <h2>Распределение</h2>
+        </div>
+        <div class="chart-container">
+          <canvas id="chart"></canvas>
+        </div>
+      </section>
+
+      <section class="panel findings-panel">
+        <div class="section-head">
+          <div>
+            <h2>Находки</h2>
+            <p id="findingsMeta">Нет результатов</p>
+          </div>
+          <div class="filters">
+            <select id="severityFilter" class="form-select" aria-label="Фильтр важности">
+              <option value="">Все уровни</option>
+              <option value="Critical">Critical</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+              <option value="Info">Info</option>
+            </select>
+            <input id="filterInput" class="form-control" placeholder="Фильтр по типу, URL, payload">
           </div>
         </div>
-        <div class="col-md-4 text-md-end text-center">
-          <a href="/download_html" target="_blank" class="btn btn-success btn-lg w-100">📥 Скачать отчёт</a>
+
+        <div class="table-responsive">
+          <table class="table findings-table" id="resTable">
+            <thead>
+              <tr>
+                <th>Важность</th>
+                <th>Тип, confidence и evidence</th>
+                <th>Цель</th>
+                <th>Request</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
         </div>
-      </div>
+      </section>
 
-      <!-- Фильтр -->
-      <div class="mb-3">
-        <input id="filterInput" class="form-control" placeholder="🔍 Фильтр по типу или важности...">
-      </div>
+      <section class="panel">
+        <div class="section-head compact">
+          <h2>Assets / attack surface</h2>
+        </div>
+        <div class="table-responsive">
+          <table class="table findings-table" id="assetTable">
+            <thead><tr><th>Type</th><th>URL</th><th>Evidence</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
 
-      <!-- Таблица -->
-      <div class="table-responsive mb-4">
-        <table class="table table-hover table-dark" id="resTable">
-          <thead>
-            <tr>
-              <th>Важность</th>
-              <th>Тип</th>
-              <th>URL</th>
-              <th>Payload</th>
-            </tr>
-          </thead>
-          <tbody></tbody>
-        </table>
-      </div>
-    </div>
-  </div>
+      <section class="panel">
+        <div class="section-head compact">
+          <h2>Discovery candidates</h2>
+        </div>
+        <div class="table-responsive">
+          <table class="table findings-table" id="candidateTable">
+            <thead><tr><th>Method</th><th>URL</th><th>Status</th><th>Reason / evidence</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="section-head compact">
+          <h2>Scan diagnostics</h2>
+        </div>
+        <div id="diagnosticsBox" class="info-grid"></div>
+      </section>
+    </section>
+  </main>
 
   <script>
+    const UI_TOKEN = "{{ ui_token }}";
     const startBtn = document.getElementById('startBtn');
     const progBox = document.getElementById('progressBox');
     const progBar = document.getElementById('progBar');
     const progMsg = document.getElementById('progMsg');
+    const progMeta = document.getElementById('progMeta');
     const resBox = document.getElementById('resultBox');
     const resTable = document.querySelector('#resTable tbody');
+    const assetTable = document.querySelector('#assetTable tbody');
+    const candidateTable = document.querySelector('#candidateTable tbody');
+    const diagnosticsBox = document.getElementById('diagnosticsBox');
     const chartCtx = document.getElementById('chart').getContext('2d');
+    const authBlock = document.getElementById('authBlock');
+    const modeNote = document.getElementById('modeNote');
+    const severityFilter = document.getElementById('severityFilter');
+    const filterInput = document.getElementById('filterInput');
+    const engineChips = document.getElementById('engineChips');
+    const cancelBtn = document.getElementById('cancelBtn');
     let sevChart;
+    let lastVulns = [];
+    let lastScanInfo = {};
+    let polling = false;
 
-    async function fetchWithTimeout(url, options = {}, timeout = 5000) {
+    const modeCopy = {
+      safe: 'Safe собирает техническую информацию, заголовки, cookies, CMS, формы и пассивные проблемы.',
+      active: 'Active добавляет SQL/XSS/NoSQL/SSTI/redirect проверки и быстрый профиль Nuclei/Katana.',
+      deep: 'Deep включает Active, расширенный discovery, FFUF и дополнительные безопасные подтверждающие probes.'
+    };
+
+    async function fetchWithTimeout(url, options = {}, timeout = 8000) {
       const controller = new AbortController();
       const id = setTimeout(() => controller.abort(), timeout);
       try {
         const response = await fetch(url, { ...options, signal: controller.signal });
         clearTimeout(id);
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
-        return await response.json();
+        const body = await response.json().catch(() => ({}));
+        if (!response.ok) throw new Error(body.error || `HTTP ${response.status}`);
+        return body;
       } catch (e) {
-        throw new Error(`Fetch error: ${e.message}`);
+        throw new Error(e.message || 'Ошибка запроса');
       }
+    }
+
+    function escapeHTML(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function selectedMode() {
+      return document.querySelector('input[name="scanMode"]:checked').value;
+    }
+
+    function updateModeUi() {
+      const mode = selectedMode();
+      authBlock.classList.toggle('visible', mode !== 'safe');
+      modeNote.textContent = modeCopy[mode];
+    }
+
+    function severityCounts(vulns) {
+      return vulns.reduce((acc, vuln) => {
+        const sev = vuln.severity || 'Info';
+        acc[sev] = (acc[sev] || 0) + 1;
+        return acc;
+      }, {});
+    }
+
+    function renderSummary(vulns, info) {
+      const counts = severityCounts(vulns);
+      document.getElementById('totalCount').textContent = vulns.length;
+      document.getElementById('criticalCount').textContent = counts.Critical || 0;
+      document.getElementById('highCount').textContent = counts.High || 0;
+      document.getElementById('pagesCount').textContent = info.pages_crawled ?? 0;
+      document.getElementById('formsCount').textContent = info.forms_total ?? 0;
+      document.getElementById('queryCount').textContent = info.query_urls_total ?? 0;
+      const discovered = (info.assets || []).length + (info.discovery_candidates || []).length;
+      document.getElementById('findingsMeta').textContent = vulns.length
+        ? `${vulns.length} находок, режим ${info.mode || 'safe'}`
+        : `No actionable findings. Discovered ${discovered} assets/candidates.`;
+    }
+
+    function renderInfo(info, cms) {
+      document.getElementById('targetTitle').textContent = info.title || info.target || 'Нет данных';
+      document.getElementById('finalUrl').textContent = info.final_url || info.target || 'N/A';
+      document.getElementById('statusCode').textContent = info.status_code || 'N/A';
+      document.getElementById('cmsName').textContent = cms.cms || 'Не определено';
+      document.getElementById('cmsVersion').textContent = cms.version || 'N/A';
+      document.getElementById('serverName').textContent = info.server || 'N/A';
+      document.getElementById('poweredBy').textContent = info.powered_by || 'N/A';
+      document.getElementById('ipList').textContent = (info.ip_addresses || []).join(', ') || 'N/A';
+      document.getElementById('responseTime').textContent =
+        info.response_time_ms === null || info.response_time_ms === undefined ? 'N/A' : `${info.response_time_ms} ms`;
+
+      const techList = document.getElementById('techList');
+      const techs = info.technologies || [];
+      techList.innerHTML = techs.length
+        ? techs.map(t => `<span class="chip">${escapeHTML(t)}</span>`).join('')
+        : '<span class="chip muted">Технологии не определены</span>';
+
+      const external = info.external_engines || {};
+      if (external.engines) renderEngineStatus(Object.values(external.engines), external.results || {});
+    }
+
+    function renderEngineStatus(engines, results = {}) {
+      if (!engineChips) return;
+      if (!engines.length) {
+        engineChips.innerHTML = '<span class="chip muted">Движки не найдены</span>';
+        return;
+      }
+      engineChips.innerHTML = engines.map(engine => {
+        const result = results[engine.name] || {};
+        const suffix = result.status ? ` · ${result.status}${result.findings ? ` · ${result.findings}` : ''}` : '';
+        const cls = engine.available ? 'chip engine-ok' : 'chip muted engine-missing';
+        return `<span class="${cls}" title="${escapeHTML(engine.description || '')}">${escapeHTML(engine.label || engine.name)}${escapeHTML(suffix)}</span>`;
+      }).join('');
+    }
+
+    async function loadEngineStatus() {
+      try {
+        const data = await fetchWithTimeout('/engines');
+        renderEngineStatus(data.engines || []);
+      } catch (e) {
+        engineChips.innerHTML = `<span class="chip muted">Не удалось проверить движки: ${escapeHTML(e.message)}</span>`;
+      }
+    }
+
+    function payloadToText(payload) {
+      if (payload === null || payload === undefined) return '';
+      if (typeof payload === 'object') return JSON.stringify(payload, null, 2);
+      return String(payload);
+    }
+
+    function renderChart(vulns) {
+      const counts = severityCounts(vulns);
+      const order = ['Critical', 'High', 'Medium', 'Low', 'Info', 'Unknown'];
+      const labels = order.filter(label => counts[label]);
+      const data = labels.map(label => counts[label]);
+      if (sevChart) sevChart.destroy();
+      sevChart = new Chart(chartCtx, {
+        type: 'doughnut',
+        data: {
+          labels: labels.length ? labels : ['Нет находок'],
+          datasets: [{
+            data: data.length ? data : [1],
+            backgroundColor: ['#dc3545', '#fd7e14', '#ffc107', '#20c997', '#6c757d', '#495057'],
+            borderWidth: 0
+          }]
+        },
+        options: {
+          plugins: { legend: { position: 'bottom' } },
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '68%'
+        }
+      });
+    }
+
+    function renderFindings() {
+      const q = filterInput.value.trim().toLowerCase();
+      const sev = severityFilter.value;
+      const rows = lastVulns.filter(v => {
+        const haystack = `${v.severity || ''} ${v.type || ''} ${v.url || ''} ${v.evidence || ''} ${payloadToText(v.payload)}`.toLowerCase();
+        return (!sev || v.severity === sev) && (!q || haystack.includes(q));
+      });
+
+      if (!rows.length) {
+        const discovered = ((lastScanInfo.assets || []).length + (lastScanInfo.discovery_candidates || []).length);
+        resTable.innerHTML = `<tr><td colspan="4" class="empty-row">No actionable findings. Discovered ${discovered} assets/candidates.</td></tr>`;
+        return;
+      }
+
+      resTable.innerHTML = rows.map(v => {
+        const sevClass = `sev-${escapeHTML(v.severity || 'Info')}`;
+        const payload = escapeHTML(payloadToText(v.payload));
+        const confidence = v.confidence ? `<small>Confidence: ${escapeHTML(v.confidence)} · Source: ${escapeHTML(v.source || 'scanner')}</small>` : '';
+        const evidence = v.evidence ? `<small>${escapeHTML(v.evidence)}</small>` : '<small>evidence не указан</small>';
+        const remediation = v.remediation ? `<small>Fix: ${escapeHTML(v.remediation)}</small>` : '';
+        return `
+          <tr>
+            <td><span class="severity-pill ${sevClass}">${escapeHTML(v.severity || 'Info')}</span></td>
+            <td><strong>${escapeHTML(v.title || v.type || 'N/A')}</strong>${confidence}${evidence}${remediation}</td>
+            <td><span class="method">${escapeHTML(v.method || 'GET')}</span><span class="url-cell">${escapeHTML(v.url || 'N/A')}</span></td>
+            <td><pre>${payload}</pre></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function renderAssets(info) {
+      const assets = info.assets || [];
+      if (!assets.length) {
+        assetTable.innerHTML = '<tr><td colspan="3" class="empty-row">No validated assets</td></tr>';
+        return;
+      }
+      assetTable.innerHTML = assets.map(asset => `
+        <tr>
+          <td>${escapeHTML(asset.type || 'endpoint')}</td>
+          <td><span class="method">${escapeHTML(asset.method || 'GET')}</span><span class="url-cell">${escapeHTML(asset.url || '')}</span></td>
+          <td>${escapeHTML(asset.evidence || '')}<small>Confidence: ${escapeHTML(asset.confidence || 'Medium')}</small></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderCandidates(info) {
+      const candidates = info.discovery_candidates || [];
+      if (!candidates.length) {
+        candidateTable.innerHTML = '<tr><td colspan="4" class="empty-row">No discovery candidates</td></tr>';
+        return;
+      }
+      candidateTable.innerHTML = candidates.map(candidate => `
+        <tr>
+          <td>${escapeHTML(candidate.method || 'GET')}</td>
+          <td class="url">${escapeHTML(candidate.url || '')}</td>
+          <td>${candidate.validated ? 'validated' : 'not validated'}</td>
+          <td>${escapeHTML(candidate.validation_evidence || candidate.reason || '')}<small>Source: ${escapeHTML(candidate.source || '')}</small></td>
+        </tr>
+      `).join('');
+    }
+
+    function renderDiagnostics(info) {
+      const diag = info.diagnostics || {};
+      const skipped = diag.skipped_reasons || {};
+      const skipText = Object.keys(skipped).length
+        ? Object.entries(skipped).map(([reason, count]) => `${escapeHTML(reason)}: ${count}`).join('<br>')
+        : 'None';
+      diagnosticsBox.innerHTML = `
+        <div><span>Requests</span><strong>${diag.requests_total ?? info.request_count ?? 0}/${info.request_budget ?? 'n/a'}</strong></div>
+        <div><span>Duration</span><strong>${info.duration_ms ? Math.round(info.duration_ms / 1000) : 0}s</strong></div>
+        <div><span>Templates checked</span><strong>${diag.templates_checked ?? 0}</strong></div>
+        <div><span>Templates skipped</span><strong>${diag.templates_skipped ?? 0}</strong></div>
+        <div><span>Budget exhausted</span><strong>${diag.budget_exhausted ? 'yes' : 'no'}</strong></div>
+        <div><span>Top skip reasons</span><strong>${skipText}</strong></div>
+      `;
     }
 
     async function poll() {
       try {
+        if (!polling) return;
         const d = await fetchWithTimeout('/progress');
         const p = d.progress;
-        progMsg.textContent = p.message || "Обновление...";
-        const percent = p.total > 0 ? Math.round((p.current / p.total) * 100) : 0;
-        progBar.style.width = percent + '%';
-        progBar.textContent = percent + '%';
-        if (p.done) await loadResults();
+        progMsg.textContent = p.message || 'Обновление...';
+        const percent = p.total > 0 ? Math.min(100, Math.round((p.current / p.total) * 100)) : 0;
+        progBar.style.width = `${percent}%`;
+        progBar.textContent = `${percent}%`;
+        progMeta.textContent = `${p.current}/${p.total}`;
+        if (p.done) {
+          polling = false;
+          cancelBtn.disabled = true;
+          await loadResults();
+        }
         else setTimeout(poll, 1000);
       } catch (e) {
-        progMsg.textContent = "Ошибка: " + e.message;
+        progMsg.textContent = `Ошибка: ${e.message}`;
         setTimeout(poll, 2000);
       }
     }
@@ -147,91 +494,89 @@
     async function loadResults() {
       try {
         const d = await fetchWithTimeout('/results');
-        const vulns = d.results || [];
+        lastVulns = d.results || [];
+        const info = d.scan_info || {};
         const cms = d.cms_info || { cms: 'N/A', version: 'N/A' };
-        resTable.innerHTML = '';
-        const counts = {};
-
-        if (!vulns.length) {
-          resTable.innerHTML = '<tr><td colspan="4" class="text-center">Нет уязвимостей 🎉</td></tr>';
-        } else {
-          vulns.forEach(v => {
-            const sev = v.severity || 'Unknown';
-            counts[sev] = (counts[sev] || 0) + 1;
-            const row = document.createElement('tr');
-            row.innerHTML = `
-              <td class="sev-${sev}">${sev}</td>
-              <td>${v.type || 'N/A'}</td>
-              <td class="text-break">${v.url || 'N/A'}</td>
-              <td><pre>${JSON.stringify(v.payload || {}, null, 2)}</pre></td>
-            `;
-            resTable.appendChild(row);
-          });
-
-          if (sevChart) sevChart.destroy();
-          sevChart = new Chart(chartCtx, {
-            type: 'doughnut',
-            data: {
-              labels: Object.keys(counts),
-              datasets: [{
-                data: Object.values(counts),
-                backgroundColor: ['#dc3545', '#fd7e14', '#ffc107', '#198754', '#6c757d']
-              }]
-            },
-            options: {
-              plugins: { legend: { position: 'bottom' } },
-              responsive: true,
-              maintainAspectRatio: false
-            }
-          });
-        }
-
-        document.getElementById('cmsName').textContent = cms.cms;
-        document.getElementById('cmsVersion').textContent = cms.version;
-        progBox.style.display = 'none';
-        resBox.style.display = 'block';
+        lastScanInfo = info;
+        renderSummary(lastVulns, info);
+        renderInfo(info, cms);
+        renderChart(lastVulns);
+        renderFindings();
+        renderAssets(info);
+        renderCandidates(info);
+        renderDiagnostics(info);
+        progBox.hidden = true;
+        resBox.hidden = false;
+        startBtn.disabled = false;
       } catch (e) {
-        resTable.innerHTML = `<tr><td colspan="4" class="text-danger">Ошибка загрузки: ${e.message}</td></tr>`;
-        progBox.style.display = 'none';
-        resBox.style.display = 'block';
+        resTable.innerHTML = `<tr><td colspan="4" class="text-danger">Ошибка загрузки: ${escapeHTML(e.message)}</td></tr>`;
+        progBox.hidden = true;
+        resBox.hidden = false;
+        startBtn.disabled = false;
       }
     }
 
+    cancelBtn.onclick = async () => {
+      cancelBtn.disabled = true;
+      progMsg.textContent = 'Останавливаю сканирование...';
+      try {
+        await fetchWithTimeout('/cancel_scan', { method: 'POST', headers: { 'X-Advscan-Token': UI_TOKEN } }, 5000);
+      } catch (e) {
+        progMsg.textContent = `Не удалось остановить: ${e.message}`;
+        cancelBtn.disabled = false;
+      }
+    };
+
     startBtn.onclick = async () => {
       const target = document.getElementById('target').value.trim();
-      const threads = parseInt(document.getElementById('threadsInput').value);
-      if (!target) return alert("Введите URL");
-      if (isNaN(threads) || threads < 1 || threads > 50) {
-        return alert("Количество потоков — от 1 до 50");
-      }
+      const threads = parseInt(document.getElementById('threadsInput').value, 10);
+      const mode = selectedMode();
+      const authorized = document.getElementById('authorizedInput').checked;
+      const allowPrivate = document.getElementById('allowPrivateInput').checked;
+      const maxRequests = document.getElementById('maxRequestsInput').value;
+      const maxDuration = document.getElementById('maxDurationInput').value;
+      if (!target) return alert('Введите URL');
+      if (Number.isNaN(threads) || threads < 1 || threads > 50) return alert('Количество потоков должно быть от 1 до 50');
+      if (mode !== 'safe' && !authorized) return alert('Подтвердите разрешение на активную проверку цели');
 
-      resBox.style.display = 'none';
-      progBox.style.display = 'block';
+      resBox.hidden = true;
+      progBox.hidden = false;
       progBar.style.width = '0%';
       progBar.textContent = '0%';
+      progMeta.textContent = '0/1';
+      progMsg.textContent = 'Запуск...';
+      cancelBtn.disabled = false;
+      startBtn.disabled = true;
+      polling = true;
 
       try {
         await fetchWithTimeout('/start_scan', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ url: target, threads })
+          headers: { 'Content-Type': 'application/json', 'X-Advscan-Token': UI_TOKEN },
+          body: JSON.stringify({ url: target, threads, mode, authorized, allowPrivate, maxRequests, maxDuration })
         });
         poll();
       } catch (e) {
-        progMsg.textContent = "Ошибка запуска: " + e.message;
+        polling = false;
+        progMsg.textContent = `Ошибка запуска: ${e.message}`;
+        startBtn.disabled = false;
+        cancelBtn.disabled = true;
       }
     };
 
-    document.getElementById('themeSwitch').onchange = e => {
-      document.documentElement.setAttribute('data-bs-theme', e.target.checked ? 'light' : 'dark');
+    document.querySelectorAll('input[name="scanMode"]').forEach(input => {
+      input.addEventListener('change', updateModeUi);
+    });
+    filterInput.addEventListener('input', renderFindings);
+    severityFilter.addEventListener('change', renderFindings);
+
+    document.getElementById('themeBtn').onclick = () => {
+      const root = document.documentElement;
+      root.setAttribute('data-bs-theme', root.getAttribute('data-bs-theme') === 'dark' ? 'light' : 'dark');
     };
 
-    document.getElementById('filterInput').addEventListener('input', e => {
-      const q = e.target.value.toLowerCase();
-      document.querySelectorAll('#resTable tbody tr').forEach(tr => {
-        tr.style.display = [...tr.cells].some(td => td.textContent.toLowerCase().includes(q)) ? '' : 'none';
-      });
-    });
+    updateModeUi();
+    loadEngineStatus();
   </script>
 </body>
 </html>
